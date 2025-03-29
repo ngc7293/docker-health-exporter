@@ -24,12 +24,14 @@ const (
 )
 
 type Options struct {
-	BaseUrl string
+	BaseUrl     string
+	HealthCheck bool
 }
 
 func parseOptions() *Options {
 	options := &Options{}
 	flag.StringVar(&options.BaseUrl, "base-url", os.Getenv("BASE_URL"), "URL prefix for HTTP server")
+	flag.BoolVar(&options.HealthCheck, "health-check", false, "Perform a health check (rather than listen for prometheus)")
 	flag.Parse()
 
 	if options.BaseUrl != "" {
@@ -121,6 +123,21 @@ func metricsHandler(client *docker.Client, writer http.ResponseWriter) error {
 func main() {
 	options := parseOptions()
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	if options.HealthCheck {
+		response, err := http.Get(fmt.Sprintf("http://localhost:8080%s/health", options.BaseUrl))
+
+		if err != nil {
+			logger.Error("failed to perform health check", "err", err)
+			os.Exit(1)
+		}
+
+		if response.StatusCode != 200 {
+			os.Exit(1)
+		}
+
+		os.Exit(0)
+	}
 
 	client, err := docker.NewClientWithOpts(docker.FromEnv)
 

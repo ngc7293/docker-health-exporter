@@ -13,4 +13,5 @@ FROM scratch AS runtime
 COPY --from=builder /build/docker-health-exporter /docker-health-exporter
 
 EXPOSE 8080
+HEALTHCHECK --start-period=0s --interval=10s --retries=1 CMD [ "/docker-health-exporter", "--health-check" ]
 ENTRYPOINT [ "/docker-health-exporter" ]
