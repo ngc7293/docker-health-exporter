@@ -2,10 +2,10 @@ FROM golang:1.24.1 AS builder
 
 WORKDIR /build
 
-COPY go.mod go.sum /build
+COPY go.mod go.sum /build/
 RUN go mod download
 
-COPY main.go       /build
+COPY main.go /build/
 RUN CGO_ENABLED=0 GOOS=linux go build -o docker-health-exporter .
 
 FROM scratch AS runtime
