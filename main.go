@@ -73,8 +73,8 @@ func metricsHandler(client *docker.Client, writer http.ResponseWriter) error {
 		return errors.New("internal server error")
 	}
 
-	output := "# HELP container_state_health_status Docker container Health checks status (mapped as int)\r\n"
-	output += "# TYPE container_state_health_status gauge\r\n"
+	output := "# HELP container_state_health_status Docker container Health checks status (mapped as int)\n"
+	output += "# TYPE container_state_health_status gauge\n"
 
 	for _, container := range containers {
 		inspect, err := client.ContainerInspect(context.Background(), container.ID)
@@ -106,7 +106,7 @@ func metricsHandler(client *docker.Client, writer http.ResponseWriter) error {
 		}
 
 		output += fmt.Sprintf(
-			"container_state_health_status{container_name=\"%s\", container_id=\"%s\"} %d\r\n",
+			"container_state_health_status{container_name=\"%s\", container_id=\"%s\"} %d\n",
 			strings.TrimPrefix(inspect.Name, "/"),
 			inspect.ID,
 			health,
